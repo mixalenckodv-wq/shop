@@ -15,10 +15,20 @@ class OrderCreateForm(forms.ModelForm):
             "phone",
             "address",
             "comment",
+            "telegram_chat_id",
         )
         widgets = {
             "address": forms.Textarea(attrs={"rows": 3}),
             "comment": forms.Textarea(attrs={"rows": 2}),
+            "telegram_chat_id": forms.TextInput(
+                attrs={"placeholder": "Необязательно — для статусов в Telegram"}
+            ),
+        }
+        labels = {
+            "telegram_chat_id": "Telegram chat_id (необязательно)",
+        }
+        help_texts = {
+            "telegram_chat_id": "Узнать свой chat_id можно, отправив боту команду /start.",
         }
 
     def clean_phone(self):
