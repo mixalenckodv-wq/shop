@@ -8,7 +8,7 @@
 - Python 3.12, Django 5, Django REST Framework
 - PostgreSQL
 - Django Admin
-- Telegram-бот (python-telegram-bot, режим webhook)
+- Telegram-бот (режим webhook, Bot API через стандартный urllib)
 - Docker Compose
 
 ## Возможности
@@ -42,6 +42,7 @@
 4. Примените миграции и создайте администратора:
 
    ```bash
+   docker compose exec web python manage.py makemigrations catalog orders
    docker compose exec web python manage.py migrate
    docker compose exec web python manage.py createsuperuser
    ```
@@ -57,9 +58,39 @@
 python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+python manage.py makemigrations catalog orders
 python manage.py migrate
 python manage.py runserver
 ```
+
+## Настройка Telegram (webhook)
+
+1. Создайте бота у [@BotFather](https://t.me/BotFather) и получите токен.
+2. Узнайте `chat_id` администратора (например, отправив боту `/start` и
+   посмотрев `getUpdates`, либо через стороннего бота).
+3. Укажите в `.env`:
+
+   ```
+   TELEGRAM_BOT_TOKEN=123456:ABC...
+   TELEGRAM_ADMIN_CHAT_ID=123456789
+   TELEGRAM_WEBHOOK_URL=https://<ваш-домен>/telegram/webhook/
+   TELEGRAM_WEBHOOK_SECRET=<случайная-строка>
+   ```
+
+4. Зарегистрируйте webhook:
+
+   ```bash
+   python manage.py telegram_webhook --set
+   ```
+
+   Полезные варианты: `--info` (текущий webhook), `--delete` (удалить).
+
+**Как это работает:**
+
+- При создании заказа администратору уходит уведомление в Telegram.
+- При переводе заказа в статус «В обработке» (в админке) клиенту приходит
+  сообщение со статусом — если он указал свой `telegram_chat_id` при заказе.
+- Бот отвечает на `/start`, показывая пользователю его `chat_id`.
 
 ## Секреты
 
@@ -70,7 +101,7 @@ python manage.py runserver
 ## Статус разработки
 
 - [x] Фаза 1 — каркас проекта, настройки, Docker
-- [ ] Фаза 2 — модели и админка
-- [ ] Фаза 3 — каталог, корзина, оформление заказа
-- [ ] Фаза 4 — Telegram-уведомления
+- [x] Фаза 2 — модели и админка
+- [x] Фаза 3 — каталог, корзина, оформление заказа
+- [x] Фаза 4 — Telegram-уведомления (webhook)
 - [ ] Фаза 5 — тесты
