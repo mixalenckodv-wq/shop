@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Заказ оформлен{% endblock %}
+{% block content %}
+<div class="order-success">
+    <h1>Спасибо! Заказ оформлен</h1>
+    {% if order %}
+        <p>Номер заказа: <strong>#{{ order.id }}</strong></p>
+        <p>Статус: <strong>{{ order.get_status_display }}</strong></p>
+        <p>Сумма: <strong>{{ order.total_price }} ₽</strong></p>
+        <p>Мы свяжемся с вами для подтверждения. Статус заказа также придёт в Telegram.</p>
+    {% else %}
+        <p>Заказ не найден.</p>
+    {% endif %}
+    <a class="btn" href="{% url 'catalog:product_list' %}">Вернуться в каталог</a>
+</div>
+{% endblock %}
