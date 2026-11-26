@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Магазин обуви{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="logo" href="{% url 'catalog:product_list' %}">ShoeShop</a>
+        <form class="search" method="get" action="{% url 'catalog:product_list' %}">
+            <input type="text" name="q" placeholder="Поиск обуви..." value="{{ query|default:'' }}">
+            <button type="submit">Найти</button>
+        </form>
+        <a class="cart-link" href="{% url 'cart:cart_detail' %}">
+            Корзина
+            {% if cart_total_quantity %}<span class="badge">{{ cart_total_quantity }}</span>{% endif %}
+        </a>
+    </div>
+</header>
+
+<main class="container">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">&copy; {% now "Y" %} ShoeShop — учебный проект</div>
+</footer>
+</body>
+</html>
