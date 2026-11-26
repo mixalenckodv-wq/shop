@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Каталог обуви{% endblock %}
+{% block content %}
+<h1>Каталог обуви</h1>
+
+<nav class="categories">
+    <a href="{% url 'catalog:product_list' %}" class="{% if not selected_category %}active{% endif %}">Все</a>
+    {% for category in categories %}
+        <a href="?category={{ category.slug }}"
+           class="{% if selected_category == category.slug %}active{% endif %}">
+            {{ category.name }}
+        </a>
+    {% endfor %}
+</nav>
+
+{% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+            <article class="product-card">
+                <a href="{{ product.get_absolute_url|default:product.get_absolute_url }}">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product }}">
+                    {% else %}
+                        <div class="placeholder">Нет фото</div>
+                    {% endif %}
+                    <h3>{{ product }}</h3>
+                </a>
+                <p class="price">{{ product.price }} ₽</p>
+                <p class="stock">
+                    {% if product.in_stock %}В наличии{% else %}Нет в наличии{% endif %}
+                </p>
+                <a class="btn" href="{% url 'catalog:product_detail' product.slug %}">Подробнее</a>
+            </article>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">← Назад</a>
+            {% endif %}
+            <span>Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">Вперёд →</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <p>Товары не найдены.</p>
+{% endif %}
+{% endblock %}
