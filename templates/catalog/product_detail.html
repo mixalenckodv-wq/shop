@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ product }}{% endblock %}
+{% block content %}
+<article class="product-detail">
+    <div class="product-media">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product }}">
+        {% else %}
+            <div class="placeholder">Нет фото</div>
+        {% endif %}
+    </div>
+
+    <div class="product-info">
+        <p class="breadcrumbs">
+            <a href="{% url 'catalog:product_list' %}">Каталог</a> /
+            <a href="?category={{ product.category.slug }}">{{ product.category.name }}</a>
+        </p>
+        <h1>{{ product }}</h1>
+        <p class="price">{{ product.price }} ₽</p>
+        <p class="meta">{{ product.get_gender_display }}{% if product.color %} · {{ product.color }}{% endif %}</p>
+        <p class="description">{{ product.description|linebreaks }}</p>
+
+        {% if product.in_stock %}
+            <form method="post" action="{% url 'cart:add_to_cart' %}" class="add-form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <label>Размер:
+                    <select name="size_id">
+                        {% for size in available_sizes %}
+                            <option value="{{ size.id }}">{{ size.size }} ({{ size.stock }} шт.)</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Количество:
+                    <input type="number" name="quantity" value="1" min="1">
+                </label>
+                <button type="submit" class="btn primary">В корзину</button>
+            </form>
+        {% else %}
+            <p class="out-of-stock">Нет в наличии</p>
+        {% endif %}
+    </div>
+</article>
+
+{% if related_products %}
+    <section class="related">
+        <h2>Похожие товары</h2>
+        <div class="product-grid">
+            {% for item in related_products %}
+                <article class="product-card">
+                    <a href="{% url 'catalog:product_detail' item.slug %}">
+                        <h3>{{ item }}</h3>
+                    </a>
+                    <p class="price">{{ item.price }} ₽</p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+{% endblock %}
